@@ -1,0 +1,86 @@
+name: Scheduled Task (Plazma/1.20.4, Upstream)
+
+on:
+  push:
+    paths:
+      - "**_upstream.yml"
+  workflow_dispatch:
+  schedule:
+    - cron: "*/20 * * * *"
+
+env:
+  MAIN: Plazma
+  MAIN_REPO: PlazmaMC/Plazma
+  MAIN_BRANCH: dev/1.20.4
+
+  JDK: 17
+
+jobs:
+  update-upstream:
+    name: Try to update upstreams
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ${{ env.MAIN }}
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ env.MAIN_REPO }}
+          path: ${{ env.MAIN }}
+          ref: ${{ env.MAIN_BRANCH }}
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Setup GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          java-version: ${{ env.JDK }}
+          version: latest
+          cache: 'gradle'
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Setup Workflow
+        run: |
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global pull.rebase true
+          ./gradlew --stacktrace
+
+      - name: Determine if an update is required
+        id: check
+        run: |
+          paper=$(./gradlew -q --no-rebuild checkPaperCommit)
+          purpur=$(./gradlew -q --no-rebuild checkPurpurCommit)
+          echo "paper=$paper" >> $GITHUB_OUTPUT; echo "purpur=$purpur" >> $GITHUB_OUTPUT
+          echo "Paper: $paper, Purpur: $purpur"
+
+      - name: Update Upstream
+        if: steps.check.outputs.paper == 'true' || steps.check.outputs.purpur == 'true'
+        run: |
+          cd ${{ env.MAIN }}
+          if ${{ steps.check.outputs.purpur }}
+            then ./gradlew --no-rebuild --stacktrace updatePurpur
+            else if ${{ steps.check.outputs.paper }}; then ./gradlew --no-rebuild --stacktrace updatePaper; fi
+          fi
+          ./gradlew applyPatches --stacktrace
+      
+      - name: Rebuild Patches
+        if: steps.check.outputs.paper == 'true' || steps.check.outputs.purpur == 'true'
+        run: | 
+          cd ${{ env.MAIN }}
+          ./gradlew rebuildPatches --stacktrace
+
+      - name: Commit Changes
+        run: |
+          cd ${{ env.MAIN }}
+
+          if ${{ steps.check.outputs.paper }}; then updated=Paper; fi
+          if ${{ steps.check.outputs.purpur }}; then
+            if [[ -z "$updated" ]]; then updated=Purpur; else updated="$updated, Purpur"; fi
+          fi
+
+          git add .
+          printf "Updated Upstream ($updated)\n\nUpstream has released updates that appear to apply and compile correctly\n\n$(cat compare.txt)" | git commit -F -
+          git fetch
+          git pull origin ${{ env.MAIN_BRANCH }}
+          git push origin ${{ env.MAIN_BRANCH }}
