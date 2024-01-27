@@ -71,7 +71,14 @@ jobs:
           cd ${{ env.MAIN }}
           ./gradlew --no-rebuild --stacktrace rebuildPatches
 
+      - name: Test build
+        if: steps.check.outputs.paper == 'true' || steps.check.outputs.purpur == 'true'
+        run:
+          cd ${{ env.MAIN }}
+          ./gradlew --stacktrace build
+
       - name: Commit Changes
+        if: steps.check.outputs.paper == 'true' || steps.check.outputs.purpur == 'true'
         run: |
           cd ${{ env.MAIN }}
 
