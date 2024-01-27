@@ -60,7 +60,7 @@ jobs:
         run: |
           cd ${{ env.MAIN }}
           if ${{ steps.check.outputs.purpur }}
-            then if ${{ steps.check.outputs.paper }}; then else ./gradlew --no-rebuild --stacktrace updatePaper; fi
+            then if ${{ steps.check.outputs.paper }}; then; else ./gradlew --no-rebuild --stacktrace updatePaper; fi
             else ./gradlew --no-rebuild --stacktrace updatePurpur
           fi
           ./gradlew applyPatches --stacktrace
@@ -82,8 +82,8 @@ jobs:
         run: |
           cd ${{ env.MAIN }}
 
-          if ${{ steps.check.outputs.paper }}; then else updated=Paper; fi
-          if ${{ steps.check.outputs.purpur }}; then else
+          if ${{ steps.check.outputs.paper }}; then; else updated=Paper; fi
+          if ${{ steps.check.outputs.purpur }}; then; else
             if [[ -z "$updated" ]]; then updated=Purpur; else updated="$updated, Purpur"; fi
           fi
 
