@@ -10,7 +10,7 @@ on:
 
 env:
   MAIN: Plazma
-  MAIN_REPO: PlazmaMC/Plazma
+  MAIN_REPO: PlazmaMC/PlazmaBukkit
   MAIN_BRANCH: dev/1.20.4
 
   JDK: 17
