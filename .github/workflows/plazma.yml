@@ -11,9 +11,9 @@ on:
 env:
   MAIN: Plazma
   MAIN_REPO: PlazmaMC/PlazmaBukkit
-  MAIN_BRANCH: dev/1.20.4
+  MAIN_BRANCH: ver/1.20.4
 
-  JDK: 17
+  JDK: 21
 
 jobs:
   update-upstream:
