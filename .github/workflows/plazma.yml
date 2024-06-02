@@ -59,8 +59,8 @@ jobs:
         run: |
           cd ${{ env.MAIN }}
           if ${{ steps.check.outputs.purpur }}
-            then if ${{ steps.check.outputs.paper }}; then echo; else ./gradlew --no-rebuild --stacktrace updatePaper; fi
-            else ./gradlew --no-rebuild --stacktrace updatePurpur
+            then if ${{ steps.check.outputs.paper }}; then echo; else ./gradlew --no-rebuild --stacktrace updateUpstream; fi
+          else ./gradlew --no-rebuild --stacktrace updateImplementation
           fi
           ./gradlew applyPatches --stacktrace
       
