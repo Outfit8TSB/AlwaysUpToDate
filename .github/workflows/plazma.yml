@@ -2,8 +2,6 @@ name: Scheduled Task (Plazma/1.20.6, Upstream)
 
 on:
   push:
-    paths:
-      - "**_upstream.yml"
   workflow_dispatch:
   schedule:
     - cron: "*/20 * * * *"
@@ -51,8 +49,8 @@ jobs:
         id: check
         run: |
           cd ${{ env.MAIN }}
-          paper=$(./gradlew -q --no-rebuild checkPaperCommit)
-          purpur=$(./gradlew -q --no-rebuild checkPurpurCommit)
+          paper=$(./gradlew -q --no-rebuild checkPaper)
+          purpur=$(./gradlew -q --no-rebuild checkPurpur)
           echo "paper=$paper" >> $GITHUB_OUTPUT; echo "purpur=$purpur" >> $GITHUB_OUTPUT
           echo "Paper: $paper, Purpur: $purpur"
 
