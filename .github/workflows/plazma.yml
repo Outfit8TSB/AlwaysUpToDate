@@ -24,7 +24,7 @@ jobs:
           repository: ${{ env.MAIN_REPO }}
           path: ${{ env.MAIN }}
           ref: ${{ env.MAIN_BRANCH }}
-          token: ${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GH_PAT }}
 
       - name: Setup GraalVM
         uses: graalvm/setup-graalvm@v1
