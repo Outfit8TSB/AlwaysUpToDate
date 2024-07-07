@@ -63,11 +63,11 @@ jobs:
           fi
           ./gradlew applyPatches --stacktrace
       
-      - name: Rebuild Patches
-        if: steps.check.outputs.paper == 'false' || steps.check.outputs.purpur == 'false'
-        run: | 
-          cd ${{ env.MAIN }}
-          ./gradlew --no-rebuild --stacktrace rebuildPatches
+      - name: Rebuild on Failure
+        if: ${{ failure() }}
+        run:
+          ./gradlew RebuildPatches --no-daemon --stacktrace 
+          ./gradlew build --no-daemon --stacktrace
 
       - name: Test build
         if: steps.check.outputs.paper == 'false' || steps.check.outputs.purpur == 'false'
