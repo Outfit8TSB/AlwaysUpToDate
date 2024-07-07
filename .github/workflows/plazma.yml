@@ -66,7 +66,7 @@ jobs:
       - name: Rebuild on Failure
         if: ${{ failure() }}
         run:
-          cd
+          cd ${ENV_MAIN}
           ./gradlew RebuildPatches --no-daemon --stacktrace 
           ./gradlew build --no-daemon --stacktrace
 
